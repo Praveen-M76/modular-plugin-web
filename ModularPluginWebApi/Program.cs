@@ -12,7 +12,9 @@ if (Directory.Exists(pluginPath))
     foreach (var file in Directory.GetFiles(pluginPath, "*.dll"))
     {
         var assembly = Assembly.LoadFrom(file);
-        builder.Services.AddControllers()
+
+        builder.Services
+            .AddControllers()
             .PartManager.ApplicationParts.Add(new AssemblyPart(assembly));
     }
 }
@@ -23,7 +25,12 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ModularPluginWebApi v1");
+    c.EnableDeepLinking();   // ⭐ Important line
+});
 
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
